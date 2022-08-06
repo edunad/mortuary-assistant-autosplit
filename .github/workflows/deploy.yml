@@ -15,11 +15,11 @@ jobs:
       - name: Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
-          name: madison.asl
-          path: ./madison.asl
+          name: mortuary.asl
+          path: ./mortuary.asl
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: madison.asl
+          files: mortuary.asl
