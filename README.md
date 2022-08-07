@@ -4,6 +4,8 @@
 - Auto-start timer on leaving the apartment.
 - Auto-split on game end (when you burn a body)
 - Tracks completed bodies
+- Tracks zones (when you enter basement.. etc)
+- Tracks items (notebook..) & core items (necklace.. etc)
 
 <br>
 
