@@ -33,8 +33,8 @@
 
     ![](https://i.rawr.dev/XMjfznJZfN.png)
 
-5. Edit the options on "Advanced" for what items you want the split to trigger
+5. Edit the options on "Advanced"
 
-    ![](https://i.rawr.dev/pl7HiWdpCW.png)
+    ![](https://i.rawr.dev/qnmcXGOY7y.png)
 
 -----
