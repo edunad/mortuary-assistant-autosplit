@@ -1,12 +1,10 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.3 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.4 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
 
     CHANGELOG:
-    - Add Zone auto-splitting
-    - Add item auto-splitting
     - Improve memory scanners
 */
 
@@ -28,8 +26,8 @@ startup {
     settings.Add("zone_3", false, "Operation room", "zonegroup");
     settings.Add("zone_4", false, "Operation hall", "zonegroup");
     settings.Add("zone_5", false, "Cold Storage", "zonegroup");
-    settings.Add("zone_6", false, "Outside", "zonegroup");
-    settings.Add("zone_7", false, "Car", "zonegroup");
+    settings.Add("zone_6", false, "Outside / Car", "zonegroup");
+    // settings.Add("zone_7", false, "Car", "zonegroup"); --> Does not trigger
     settings.Add("zone_8", false, "Basement", "zonegroup");
 
     settings.Add("itemgroup", true, "Auto-split items");
@@ -54,6 +52,8 @@ startup {
 
 init {
     vars.gameAssembly = modules.Where(m => m.ModuleName == "GameAssembly.dll").First();
+    if(vars.gameAssembly == null) return;
+
     vars.gameBase = vars.gameAssembly.BaseAddress;
 
     vars.playerBase = 0x00;
@@ -74,10 +74,12 @@ init {
     vars.ptrGameManagerOffset = vars.gameBase + vars.gameManagerBase;
     vars.ptrStaticDatabaseOffset = vars.gameBase + vars.staticDataBase;
 
+	vars.startup = new MemoryWatcherList();
 	vars.watchers = new MemoryWatcherList();
-	vars.exports = new MemoryWatcherList();
 
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrPlayerOffset, 0xB8, 0, 0x18, 0x178)) { Name = "inCar" });
+    vars.startup.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrPlayerOffset, 0xB8, 0, 0x18, 0x178)) { Name = "inCar" });
+
+    // vars.watchers.Add(new MemoryWatcher<float>(new DeepPointer(vars.ptrPlayerOffset, 0xB8, 0, 0x18, 0x180)) { Name = "LRLock" }); == -15
     vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0x14C)) { Name = "zone" });
     vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x125)) { Name = "gameEnded" });
     vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x58)) { Name = "sigils" });
@@ -92,28 +94,29 @@ init {
     vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA4)) { Name = "usedNecklace" });
 
     for (int i = 0; i < vars.__max_sigils; ++i)
-        vars.exports.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
+        vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
 
     for (int i = 0; i < vars.__max_bodies; ++i)
-        vars.exports.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0xf0, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
+        vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0xf0, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
 
     vars.__trackTablet = false;
 }
 
 start {
-    if(vars.watchers["inCar"].Current == vars.watchers["inCar"].Old) return false;
-    return vars.watchers["inCar"].Current;
+    if(vars.startup["inCar"].Current == vars.startup["inCar"].Old) return false;
+    return vars.startup["inCar"].Current;
 }
 
 update {
-    if(vars.watchers == null || vars.exports == null) return;
-    vars.watchers.UpdateAll(game);
+    if(vars.startup == null || vars.watchers == null) return;
 
     if(timer.CurrentPhase != TimerPhase.Running) {
         vars.__zoneTrack = new bool[vars.__max_zones];
         vars.__trackTablet = false;
+
+        vars.startup.UpdateAll(game);
     } else {
-        vars.exports.UpdateAll(game);
+        vars.watchers.UpdateAll(game);
     }
 }
 
@@ -144,9 +147,8 @@ split {
     // Auto-split on body complete
     if(settings["split_body_complete"]) {
         for (int i = 0; i < vars.__max_bodies; ++i) {
-
-            int oldState = vars.exports["body_" + i].Old;
-            int state = vars.exports["body_" + i].Current;
+            int oldState = vars.watchers["body_" + i].Old;
+            int state = vars.watchers["body_" + i].Current;
 
             if(oldState == 5 && state == 0) { // TROCAR ---- > OPTABLE
                 return true;
@@ -157,8 +159,8 @@ split {
     // Auto-split on sigil found
     if(settings["split_sigil_found"]) {
         for (int i = 0; i < vars.watchers["sigils"].Current; ++i) {
-            bool oldState = vars.exports["sigil_" + i].Old;
-            bool state = vars.exports["sigil_" + i].Current;
+            bool oldState = vars.watchers["sigil_" + i].Old;
+            bool state = vars.watchers["sigil_" + i].Current;
             if(oldState == state) continue;
 
             return true;
@@ -168,7 +170,7 @@ split {
     // ZONE SPLITTING
     int currentZone = vars.watchers["zone"].Current;
     if(currentZone != vars.watchers["zone"].Old) {
-        if(!vars.__zoneTrack[currentZone]) {
+        if(!vars.__zoneTrack[currentZone] && currentZone != 7) {
             vars.__zoneTrack[currentZone] = true;
             return settings["zone_" + currentZone];
         }

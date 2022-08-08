@@ -1,8 +1,17 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.insertFinalNewline": true,
+    "trailing-spaces.trimOnSave": true,
+    "editor.formatOnSave": true,
+    "files.eol": "\n",
+    "terminal.integrated.cwd": "./"
+  },
+  "extensions": {
+    "recommendations": ["B0sh.asl-extension", "shardulm94.trailing-spaces"]
+  }
 }
