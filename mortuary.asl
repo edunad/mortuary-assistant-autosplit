@@ -1,11 +1,11 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.4 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.5 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
 
     CHANGELOG:
-    - Improve memory scanners
+    - Improve / cleanup zone detection
 */
 
 
@@ -20,14 +20,14 @@ startup {
     settings.Add("autosplit_gameend", false, "Game end", "settingsgroup");
 
     settings.Add("zonegroup", true, "Auto-split zone");
-    settings.Add("zone_0", false, "Apartment", "zonegroup");
+    // settings.Add("zone_0", false, "Apartment", "zonegroup"); // not used
     settings.Add("zone_1", false, "Bathroom", "zonegroup");
     settings.Add("zone_2", false, "Hall", "zonegroup");
     settings.Add("zone_3", false, "Operation room", "zonegroup");
     settings.Add("zone_4", false, "Operation hall", "zonegroup");
     settings.Add("zone_5", false, "Cold Storage", "zonegroup");
-    settings.Add("zone_6", false, "Outside / Car", "zonegroup");
-    // settings.Add("zone_7", false, "Car", "zonegroup"); --> Does not trigger
+    // settings.Add("zone_6", false, "Outside / Car", "zonegroup"); // not used
+    // settings.Add("zone_7", false, "Car", "zonegroup"); // not used
     settings.Add("zone_8", false, "Basement", "zonegroup");
 
     settings.Add("itemgroup", true, "Auto-split items");
@@ -41,16 +41,19 @@ startup {
     settings.Add("item_coin", false, "Used Other coin", "itemlore");
     settings.Add("item_necklace", false, "Used Necklace", "itemlore");
 
-
     // INTERNAL
     vars.__max_bodies = 3;
     vars.__max_sigils = 4;
     vars.__max_zones = 9;
 
     vars.__zoneTrack = new bool[vars.__max_zones];
+    // ---
 }
 
+
 init {
+    if(modules == null) return;
+
     vars.gameAssembly = modules.Where(m => m.ModuleName == "GameAssembly.dll").First();
     if(vars.gameAssembly == null) return;
 
@@ -170,7 +173,7 @@ split {
     // ZONE SPLITTING
     int currentZone = vars.watchers["zone"].Current;
     if(currentZone != vars.watchers["zone"].Old) {
-        if(!vars.__zoneTrack[currentZone] && currentZone != 7) {
+        if(!vars.__zoneTrack[currentZone] && settings.ContainsKey("zone_" + currentZone)) {
             vars.__zoneTrack[currentZone] = true;
             return settings["zone_" + currentZone];
         }
