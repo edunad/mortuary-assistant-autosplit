@@ -1,4 +1,5 @@
 # The Mortuary Assistant AutoSplitter
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P21MQ2K)
 
 ## FEATURES
 - Auto-start timer on leaving the apartment.
