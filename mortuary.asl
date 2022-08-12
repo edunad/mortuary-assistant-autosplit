@@ -1,15 +1,16 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.5 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.6 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
+    - v1.0.36 = 45207552
 
     CHANGELOG:
-    - Improve / cleanup zone detection
+    - Fix pointers not working on new update (v1.0.36)
 */
 
 
-state("The Mortuary Assistant", "1.0.33") { }
+state("The Mortuary Assistant", "1.0.36") { }
 
 startup {
 
@@ -63,13 +64,13 @@ init {
     vars.gameManagerBase = 0x00;
     vars.staticDataBase = 0x00;
 
-    if (vars.gameAssembly.ModuleMemorySize == 45203456) {
-        vars.playerBase = 0x024CCD40;
-        vars.gameManagerBase = 0x024A1C70;
-        vars.staticDataBase = 0x024B6708;
+    if (vars.gameAssembly.ModuleMemorySize == 45207552) {
+        vars.playerBase = 0x024CDE10;
+        vars.gameManagerBase = 0x024A2D40;
+        vars.staticDataBase = 0x024E1968;
     } else {
         print("[WARNING] Invalid The Mortuary Assistant game version");
-        print("[WARNING] Could not find scene pointers");
+        print("[WARNING] Could not find pointers");
     }
 
     vars.gameBase = vars.gameAssembly.BaseAddress;
@@ -82,25 +83,25 @@ init {
 
     vars.startup.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrPlayerOffset, 0xB8, 0, 0x18, 0x178)) { Name = "inCar" });
 
-    // vars.watchers.Add(new MemoryWatcher<float>(new DeepPointer(vars.ptrPlayerOffset, 0xB8, 0, 0x18, 0x180)) { Name = "LRLock" }); == -15
-    vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0x14C)) { Name = "zone" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x125)) { Name = "gameEnded" });
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x12D)) { Name = "gameEnded" });
     vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x58)) { Name = "sigils" });
-
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0x9D)) { Name = "hasTablet" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA5)) { Name = "hasNotepad" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA7)) { Name = "hasClipboard" });
-
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0x9F)) { Name = "used10Year" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA2)) { Name = "used5Year" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA0)) { Name = "usedOtherCoin" });
-    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0x2B8, 0xA4)) { Name = "usedNecklace" });
 
     for (int i = 0; i < vars.__max_sigils; ++i)
         vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
 
     for (int i = 0; i < vars.__max_bodies; ++i)
-        vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0xf0, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
+        vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0xF8, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
+
+
+    vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x14C)) { Name = "zone" });
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x9D)) { Name = "hasTablet" }); // aka Mark
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA5)) { Name = "hasNotepad" });
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA7)) { Name = "hasClipboard" });
+
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x9F)) { Name = "used10Year" }); // self coin
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA2)) { Name = "used5Year" }); // father coin
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA0)) { Name = "usedOtherCoin" }); // ??
+    vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA4)) { Name = "usedNecklace" }); // necklace
 
     vars.__trackTablet = false;
 }
