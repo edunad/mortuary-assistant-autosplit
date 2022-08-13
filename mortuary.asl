@@ -1,13 +1,12 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.7 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.8 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
     - v1.0.36 = 45207552
 
     CHANGELOG:
-    - Add "All endings" mode
-    - Improve timer start (now starts at door)
+    - Fix gameEnded triggering a split
 */
 
 
@@ -170,7 +169,7 @@ split {
     if(timer.CurrentPhase != TimerPhase.Running) return false;
 
     // Game over, split
-    if(vars.ingame["gameEnded"].Current != vars.ingame["gameEnded"].Old) return settings["autosplit_gameend"];
+    if(vars.ingame["gameEnded"].Current && vars.ingame["gameEnded"].Current != vars.ingame["gameEnded"].Old) return settings["autosplit_gameend"];
 
     // Clipboard, split
     if(vars.ingame["hasClipboard"].Current != vars.ingame["hasClipboard"].Old) return settings["item_clipboard"];
