@@ -1,12 +1,12 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.8 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.9 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
     - v1.0.36 = 45207552
 
     CHANGELOG:
-    - Fix gameEnded triggering a split
+    - Fixed item splits triggering even if false
 */
 
 
@@ -172,22 +172,22 @@ split {
     if(vars.ingame["gameEnded"].Current && vars.ingame["gameEnded"].Current != vars.ingame["gameEnded"].Old) return settings["autosplit_gameend"];
 
     // Clipboard, split
-    if(vars.ingame["hasClipboard"].Current != vars.ingame["hasClipboard"].Old) return settings["item_clipboard"];
+    if(vars.ingame["hasClipboard"].Current && vars.ingame["hasClipboard"].Current != vars.ingame["hasClipboard"].Old) return settings["item_clipboard"];
 
     // Notepad, split
-    if(vars.ingame["hasNotepad"].Current != vars.ingame["hasNotepad"].Old) return settings["item_notepad"];
+    if(vars.ingame["hasNotepad"].Current && vars.ingame["hasNotepad"].Current != vars.ingame["hasNotepad"].Old) return settings["item_notepad"];
 
     // Demon Tablet, split
-    if(!vars.__trackTablet && vars.ingame["hasTablet"].Current != vars.ingame["hasTablet"].Old) {
+    if(!vars.__trackTablet && vars.ingame["hasTablet"].Current && vars.ingame["hasTablet"].Current != vars.ingame["hasTablet"].Old) {
         vars.__trackTablet = true;
         return settings["item_tablet"];
     }
 
     // 10 Year Coin
-    if(vars.ingame["used10Year"].Current != vars.ingame["used10Year"].Old) return settings["item_10_coin"];
-    if(vars.ingame["used5Year"].Current != vars.ingame["used5Year"].Old) return settings["item_5_coin"];
-    if(vars.ingame["usedOtherCoin"].Current != vars.ingame["usedOtherCoin"].Old) return settings["item_coin"];
-    if(vars.ingame["usedNecklace"].Current != vars.ingame["usedNecklace"].Old) return settings["item_necklace"];
+    if(vars.ingame["used10Year"].Current && vars.ingame["used10Year"].Current != vars.ingame["used10Year"].Old) return settings["item_10_coin"];
+    if(vars.ingame["used5Year"].Current && vars.ingame["used5Year"].Current != vars.ingame["used5Year"].Old) return settings["item_5_coin"];
+    if(vars.ingame["usedOtherCoin"].Current && vars.ingame["usedOtherCoin"].Current != vars.ingame["usedOtherCoin"].Old) return settings["item_coin"];
+    if(vars.ingame["usedNecklace"].Current && vars.ingame["usedNecklace"].Current != vars.ingame["usedNecklace"].Old) return settings["item_necklace"];
 
     // Auto-split on body complete
     if(settings["split_body_complete"]) {
