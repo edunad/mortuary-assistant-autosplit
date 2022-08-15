@@ -1,12 +1,13 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.9 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.10 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
     - v1.0.36 = 45207552
 
     CHANGELOG:
-    - Fixed item splits triggering even if false
+    - Game end enabled by default
+    - Fixed hints
 */
 
 
@@ -17,7 +18,7 @@ startup {
     // Settings
     settings.Add("modes", true, "Mode");
     settings.Add("mode_all_endings", false, "All Endings", "modes");
-    settings.SetToolTip("mode_all_endings", "Timer starts after loading and pauses on loadings");
+    settings.SetToolTip("mode_all_endings", "Timer starts after loading to the apartment and pauses on loadings");
 
     settings.Add("splitsgroup", true, "Splits");
 
@@ -25,9 +26,9 @@ startup {
     settings.Add("split_sigil_found", false, "Sigil found", "settingsgroup");
     settings.SetToolTip("split_sigil_found", "When you uncover a sigil");
     settings.Add("split_body_complete", false, "Body complete", "settingsgroup");
-    settings.SetToolTip("split_sigil_found", "When you complete a body");
-    settings.Add("autosplit_gameend", false, "Game end", "settingsgroup");
-    settings.SetToolTip("split_sigil_found", "When you burn a body");
+    settings.SetToolTip("split_body_complete", "When you complete a body");
+    settings.Add("autosplit_gameend", true, "Game end", "settingsgroup");
+    settings.SetToolTip("autosplit_gameend", "When you burn a body");
 
     settings.Add("zonegroup", true, "Zone", "splitsgroup");
     settings.SetToolTip("zonegroup", "When you enter a certain zone");
