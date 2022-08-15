@@ -15,11 +15,16 @@
 
 - Made by FailCake ([Twitch](https://www.twitch.tv/birbcaw_) | [Github](https://github.com/edunad)) & Pointer wizard Hazzytje ([Github](https://github.com/Hazzytje))
 
-<br>
-
 ------------------
 
 ## INSTRUCTIONS
+
+### AUTO-SPLIT IS NOW AVAILABLE AT LIVESPLIT, SIMPLY ENABLE IT AFTER SELECTING THE GAME
+![](https://i.rawr.dev/Zr7QLiqiAS.png)
+
+------------------
+
+### MANUAL / DEVELOPMENT
 
 1. Download the latest **mortuary.asl** from [releases](https://github.com/edunad/mortuary-assistant-autosplit/releases)
 2. Open Layout Editor on LiveSplit
