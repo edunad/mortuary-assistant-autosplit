@@ -1,17 +1,17 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.10 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.11 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
     - v1.0.36 = 45207552
+    - v1.0.38 = 45223936
 
     CHANGELOG:
-    - Game end enabled by default
-    - Fixed hints
+    - Fixed pointers not working on new game version
 */
 
 
-state("The Mortuary Assistant", "1.0.36") { }
+state("The Mortuary Assistant", "1.0.38") { }
 
 startup {
 
@@ -78,18 +78,18 @@ init {
     vars.staticDataBase = 0x00;
     vars.inventoryBase = 0x00;
 
-    if (vars.gameAssembly.ModuleMemorySize == 45207552) {
-        vars.playerBase = 0x024CDE10;
-        vars.gameManagerBase = 0x024A2D40;
-        vars.staticDataBase = 0x024E1968;
-        vars.inventoryBase = 0x024B72F8;
+    var mdlSize = vars.gameAssembly.ModuleMemorySize;
+    print("[INFO] The Mortuary Assistant game version: " + mdlSize);
+    if (mdlSize == 45223936) {
+        vars.gameManagerBase = 0x024A6110;
+        vars.staticDataBase = 0x024E4D50;
+        vars.inventoryBase = 0x024BA6D0;
     } else {
         print("[WARNING] Invalid The Mortuary Assistant game version");
         print("[WARNING] Could not find pointers");
     }
 
     vars.gameBase = vars.gameAssembly.BaseAddress;
-    vars.ptrPlayerOffset = vars.gameBase + vars.playerBase;
     vars.ptrGameManagerOffset = vars.gameBase + vars.gameManagerBase;
     vars.ptrStaticDatabaseOffset = vars.gameBase + vars.staticDataBase;
     vars.ptrInventoryOffset = vars.gameBase + vars.inventoryBase;
@@ -111,7 +111,7 @@ init {
         vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
 
     for (int i = 0; i < vars.__max_bodies; ++i)
-        vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0xF8, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
+        vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x100, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
 
     vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x14C)) { Name = "zone" });
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x9D)) { Name = "hasTablet" }); // aka Mark
