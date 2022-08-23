@@ -1,5 +1,5 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.11 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.12 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
@@ -7,7 +7,7 @@
     - v1.0.38 = 45223936
 
     CHANGELOG:
-    - Fixed pointers not working on new game version
+    - Fixed game ending pointing to the wrong pointer
 */
 
 
@@ -104,7 +104,7 @@ init {
 	};
 	vars.getItem = getItem;
 
-    vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x12D)) { Name = "gameEnded" });
+    vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x135)) { Name = "gameEnded" });
     vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x58)) { Name = "sigils" });
 
     for (int i = 0; i < vars.__max_sigils; ++i)
