@@ -1,18 +1,19 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.13 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.14 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
     - v1.0.36 = 45207552
     - v1.0.38 = 45223936
     - v1.0.40 = 45223936
+    - v1.0.51 = 45236224
 
     CHANGELOG:
     - Updated game pointers to new version
 */
 
 
-state("The Mortuary Assistant", "1.0.40") { }
+state("The Mortuary Assistant", "1.0.51") { }
 
 startup {
 
@@ -61,6 +62,7 @@ startup {
     vars.__max_sigils = 4;
     vars.__max_zones = 9;
 
+    vars.__gameAssembly__ = null;
     vars.__zoneTrack = new bool[vars.__max_zones];
     // ---
 }
@@ -69,28 +71,33 @@ startup {
 init {
     if(modules == null) return;
 
-    vars.gameAssembly = modules.Where(m => m.ModuleName == "GameAssembly.dll").First();
-    if(vars.gameAssembly == null) return;
+    var assembl = modules.Where(m => m.ModuleName == "GameAssembly.dll").FirstOrDefault();
+    if(assembl != null) vars.__gameAssembly__ = assembl;
+    if(vars.__gameAssembly__ == null) return;
 
-    vars.gameBase = vars.gameAssembly.BaseAddress;
+    vars.gameBase = vars.__gameAssembly__.BaseAddress;
 
     vars.playerBase = 0x00;
     vars.gameManagerBase = 0x00;
     vars.staticDataBase = 0x00;
     vars.inventoryBase = 0x00;
 
-    var mdlSize = vars.gameAssembly.ModuleMemorySize;
+    var mdlSize = vars.__gameAssembly__.ModuleMemorySize;
     print("[INFO] The Mortuary Assistant game version: " + mdlSize);
-    if (mdlSize == 45223936) {
-        vars.gameManagerBase = 0x024A6330;
-        vars.staticDataBase = 0x024E4F88;
-        vars.inventoryBase = 0x024BA8F0;
+    if (mdlSize == 45236224) {
+        vars.gameManagerBase = 0x024A9540;
+        vars.staticDataBase = 0x024E8198;
+        vars.inventoryBase = 0x024BDB00;
+
+        version = "1.0.51";
     } else {
+        version = "UNKNOWN";
+
         print("[WARNING] Invalid The Mortuary Assistant game version");
         print("[WARNING] Could not find pointers");
+        return;
     }
 
-    vars.gameBase = vars.gameAssembly.BaseAddress;
     vars.ptrGameManagerOffset = vars.gameBase + vars.gameManagerBase;
     vars.ptrStaticDatabaseOffset = vars.gameBase + vars.staticDataBase;
     vars.ptrInventoryOffset = vars.gameBase + vars.inventoryBase;
@@ -105,16 +112,16 @@ init {
 	};
 	vars.getItem = getItem;
 
-    vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x135)) { Name = "gameEnded" });
+    vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x13D)) { Name = "gameEnded" });
     vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x58)) { Name = "sigils" });
 
     for (int i = 0; i < vars.__max_sigils; ++i)
         vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
 
     for (int i = 0; i < vars.__max_bodies; ++i)
-        vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x100, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
+        vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x108, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
 
-    vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x14C)) { Name = "zone" });
+    vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x154)) { Name = "zone" });
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x9D)) { Name = "hasTablet" }); // aka Mark
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA5)) { Name = "hasNotepad" });
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA7)) { Name = "hasClipboard" });
@@ -124,7 +131,7 @@ init {
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA0)) { Name = "usedOtherCoin" }); // ??
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0xA4)) { Name = "usedNecklace" }); // necklace
 
-    vars.special.Add(new MemoryWatcher<float>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x158)) { Name = "sessionTimer" });
+    vars.special.Add(new MemoryWatcher<float>(new DeepPointer(vars.ptrStaticDatabaseOffset, 0xB8, 0, 0x18, 0x164)) { Name = "sessionTimer" });
 
     vars.__trackTablet = false;
     vars.__pickedCarKeys = false;
