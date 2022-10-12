@@ -1,5 +1,5 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.14 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
+    v0.0.15 --- By FailCake (edunad) & Hazzytje (Pointer wizard <3)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
@@ -7,13 +7,14 @@
     - v1.0.38 = 45223936
     - v1.0.40 = 45223936
     - v1.0.51 = 45236224
+    - v1.0.52 = 45240320
 
     CHANGELOG:
     - Updated game pointers to new version
 */
 
 
-state("The Mortuary Assistant", "1.0.51") { }
+state("The Mortuary Assistant", "1.0.52") { }
 
 startup {
 
@@ -84,18 +85,18 @@ init {
 
     var mdlSize = vars.__gameAssembly__.ModuleMemorySize;
     print("[INFO] The Mortuary Assistant game version: " + mdlSize);
-    if (mdlSize == 45236224) {
-        vars.gameManagerBase = 0x024A9540;
-        vars.staticDataBase = 0x024E8198;
-        vars.inventoryBase = 0x024BDB00;
+    if (mdlSize == 45240320) {
+        vars.gameManagerBase = 0x024AA550;
+        vars.staticDataBase = 0x024E91A8;
+        vars.inventoryBase = 0x024BEB10;
 
-        version = "1.0.51";
+        version = "1.0.52";
+        print("[INFO] Found game version: " + version);
     } else {
         version = "UNKNOWN";
 
         print("[WARNING] Invalid The Mortuary Assistant game version");
         print("[WARNING] Could not find pointers");
-        return;
     }
 
     vars.ptrGameManagerOffset = vars.gameBase + vars.gameManagerBase;
