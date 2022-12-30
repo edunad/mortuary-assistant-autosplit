@@ -1,5 +1,5 @@
 /*  The Mortuary Assistant Autosplitter
-    v0.0.18 --- By FailCake (edunad)
+    v0.0.19 --- By FailCake (edunad)
 
     GAME VERSIONS:
     - v1.0.33 = 45203456
@@ -11,13 +11,13 @@
     - v1.0.59 = 50192384
     - v1.0.65 = 50196480
     - v1.0.68 = 50466816
+    - v1.1.1 = 50475008
 
     CHANGELOG:
     - Updated game pointers to new version
 */
 
-
-state("The Mortuary Assistant", "1.0.68") { }
+state("The Mortuary Assistant", "1.1.1") { }
 
 startup {
 
@@ -88,12 +88,12 @@ init {
 
     var mdlSize = vars.__gameAssembly__.ModuleMemorySize;
     print("[INFO] The Mortuary Assistant game version: " + mdlSize);
-    if (mdlSize == 50466816) {
-        vars.gameManagerBase = 0x029A9628;
-        vars.staticDataBase = 0x029ABF68;
-        vars.inventoryBase = 0x029AD830;
+    if (mdlSize == 50475008) {
+        vars.gameManagerBase = 0x029AB800;
+        vars.staticDataBase = 0x029AE088;
+        vars.inventoryBase = 0x029AF9C0;
 
-        version = "1.0.68";
+        version = "1.1.1";
         print("[INFO] Found game version: " + version);
     } else {
         version = "UNKNOWN";
@@ -155,11 +155,13 @@ start {
         return vars.special["sessionTimer"].Current > 0f && vars.special["sessionTimer"].Current <= 0.1f;
     } else {
         string item = vars.getItem(0);
+        print(item);
 
         if(item == "itemCarKeys" && !vars.__pickedCarKeys) {
             vars.__pickedCarKeys = true;
         }else if(vars.__pickedCarKeys && (item == null || item == "")) {
             vars.__pickedCarKeys = false;
+            print("[Start] Auto-starting");
             return true;
         }
 
