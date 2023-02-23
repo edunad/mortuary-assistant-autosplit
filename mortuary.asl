@@ -12,12 +12,13 @@
     - v1.0.65 = 50196480
     - v1.0.68 = 50466816
     - v1.1.1 = 50475008
+    - v1.1.3 = 52252672
 
     CHANGELOG:
     - Updated game pointers to new version
 */
 
-state("The Mortuary Assistant", "1.1.1") { }
+state("The Mortuary Assistant", "1.1.3") { }
 
 startup {
 
@@ -88,12 +89,12 @@ init {
 
     var mdlSize = vars.__gameAssembly__.ModuleMemorySize;
     print("[INFO] The Mortuary Assistant game version: " + mdlSize);
-    if (mdlSize == 50475008) {
-        vars.gameManagerBase = 0x029AB800;
-        vars.staticDataBase = 0x029AE088;
-        vars.inventoryBase = 0x029AF9C0;
+    if (mdlSize == 52252672) {
+        vars.gameManagerBase = 0x02B28EE0;
+        vars.staticDataBase = 0x02B2AB30;
+        vars.inventoryBase = 0x02B2C238;
 
-        version = "1.1.1";
+        version = "1.1.3";
         print("[INFO] Found game version: " + version);
     } else {
         version = "UNKNOWN";
