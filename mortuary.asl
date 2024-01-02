@@ -15,12 +15,13 @@
     - v1.1.3 = 52252672
     - v1.1.23 = 50483200
     - v1.2.0 = 50511872
+    - v1.2.3 = 50507776
 
     CHANGELOG:
     - Updated game pointers to new version
 */
 
-state("The Mortuary Assistant", "1.1.23") { }
+state("The Mortuary Assistant", "1.2.3") { }
 
 startup {
 
@@ -91,12 +92,12 @@ init {
 
     var mdlSize = vars.__gameAssembly__.ModuleMemorySize;
     print("[INFO] The Mortuary Assistant game version: " + mdlSize);
-    if (mdlSize == 50511872) {
-        vars.gameManagerBase = 0x029B5500;
-        vars.staticDataBase = 0x029B5370;
-        vars.inventoryBase = 0x029B68C8;
+    if (mdlSize == 50507776) {
+        vars.gameManagerBase = 0x029B4698;
+        vars.staticDataBase = 0x029B4508;
+        vars.inventoryBase = 0x029B59F8;
 
-        version = "1.2.0";
+        version = "1.2.3";
         print("[INFO] Found game version: " + version);
     } else {
         version = "UNKNOWN";
@@ -120,10 +121,10 @@ init {
 	vars.getItem = getItem;
 
     vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x13D)) { Name = "gameEnded" });
-    vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x58)) { Name = "sigils" });
+    vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x50)) { Name = "sigils" });
 
     for (int i = 0; i < vars.__max_sigils; ++i)
-        vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x48, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
+        vars.ingame.Add(new MemoryWatcher<bool>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x38, 0x30, 0x40, 0x10, 0x20 + 0x8 * i, 0x28, 0x18)) { Name = "sigil_" + i });
 
     for (int i = 0; i < vars.__max_bodies; ++i)
         vars.ingame.Add(new MemoryWatcher<int>(new DeepPointer(vars.ptrGameManagerOffset, 0xB8, 0, 0x108, 0x20 + 0x8 * i, 0x28)) { Name = "body_" + i });
